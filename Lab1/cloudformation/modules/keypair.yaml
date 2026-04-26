@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'KeyPair Module for Lab 1'
+
+Parameters:
+  ProjectName:
+    Type: String
+  KeyName:
+    Type: String
+
+Resources:
+  KeyPair:
+    Type: 'AWS::EC2::KeyPair'
+    Properties:
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-key'
+
+Outputs:
+  KeyName:
+    Value: !Ref KeyPair

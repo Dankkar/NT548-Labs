@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Security Groups Module for Lab 1'
+
+Parameters:
+  ProjectName:
+    Type: String
+  VPCId:
+    Type: String
+  SSHAllowedIP:
+    Type: String
+
+Resources:
+  PublicEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow SSH inbound traffic to public EC2 instances'
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHAllowedIP
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-public-ec2-sg'
+
+  PrivateEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow traffic from public EC2 instances to private EC2 instances'
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref PublicEC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-private-ec2-sg'
+
+Outputs:
+  PublicEC2SecurityGroupId:
+    Value: !Ref PublicEC2SecurityGroup
+  PrivateEC2SecurityGroupId:
+    Value: !Ref PrivateEC2SecurityGroup

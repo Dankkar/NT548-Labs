@@ -1,0 +1,20 @@
+# CloudFormation Packaged Templates
+packaged.yaml
+*packaged*.yaml
+output.yaml
+
+# AWS CLI / Local state (if any)
+.aws-sam/
+samconfig.toml
+
+# Private Keys (Crucial for security)
+*.pem
+
+# OS / Editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log

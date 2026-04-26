@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Root Stack for Lab 1 - Nested Stacks Approach'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: 'lab1'
+  VPCCidr:
+    Type: String
+    Default: '10.0.0.0/16'
+  PublicSubnet1Cidr:
+    Type: String
+    Default: '10.0.1.0/24'
+  PublicSubnet2Cidr:
+    Type: String
+    Default: '10.0.2.0/24'
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: '10.0.101.0/24'
+  PrivateSubnet2Cidr:
+    Type: String
+    Default: '10.0.102.0/24'
+  AmiId:
+    Type: String
+    Default: 'ami-098341ffb8b768450'
+  InstanceType:
+    Type: String
+    Default: 't3.micro'
+  KeyName:
+    Type: String
+    Default: 'lab1-key'
+  SSHAllowedIP:
+    Type: String
+    Default: '0.0.0.0/0'
+
+Resources:
+  VPCStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: ./modules/vpc.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        VPCCidr: !Ref VPCCidr
+        PublicSubnet1Cidr: !Ref PublicSubnet1Cidr
+        PublicSubnet2Cidr: !Ref PublicSubnet2Cidr
+        PrivateSubnet1Cidr: !Ref PrivateSubnet1Cidr
+        PrivateSubnet2Cidr: !Ref PrivateSubnet2Cidr
+
+
+  NatGatewayStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: ./modules/nat_gateway.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnet1Id
+
+  RouteTablesStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: ./modules/route_tables.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        VPCId: !GetAtt VPCStack.Outputs.VPCId
+        InternetGatewayId: !GetAtt VPCStack.Outputs.InternetGatewayId
+        NatGatewayId: !GetAtt NatGatewayStack.Outputs.NatGatewayId
+        PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1Id
+        PublicSubnet2Id: !GetAtt VPCStack.Outputs.PublicSubnet2Id
+        PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1Id
+        PrivateSubnet2Id: !GetAtt VPCStack.Outputs.PrivateSubnet2Id
+
+  SecurityGroupsStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: ./modules/security_groups.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        VPCId: !GetAtt VPCStack.Outputs.VPCId
+        SSHAllowedIP: !Ref SSHAllowedIP
+
+  EC2InstancesStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: ./modules/ec2_instances.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        AmiId: !Ref AmiId
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnet1Id
+        PrivateSubnetId: !GetAtt VPCStack.Outputs.PrivateSubnet1Id
+        PublicEC2SecurityGroupId: !GetAtt SecurityGroupsStack.Outputs.PublicEC2SecurityGroupId
+        PrivateEC2SecurityGroupId: !GetAtt SecurityGroupsStack.Outputs.PrivateEC2SecurityGroupId
+
+Outputs:
+  VPCId:
+    Value: !GetAtt VPCStack.Outputs.VPCId
+  PublicInstanceIP:
+    Value: !GetAtt EC2InstancesStack.Outputs.PublicInstanceIP
+  PrivateInstanceIP:
+    Value: !GetAtt EC2InstancesStack.Outputs.PrivateInstanceIP

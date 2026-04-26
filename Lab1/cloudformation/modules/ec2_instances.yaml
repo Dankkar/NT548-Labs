@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 Instances Module for Lab 1'
+
+Parameters:
+  ProjectName:
+    Type: String
+  AmiId:
+    Type: AWS::EC2::Image::Id
+  InstanceType:
+    Type: String
+  KeyName:
+    Type: String
+  PublicSubnetId:
+    Type: String
+  PrivateSubnetId:
+    Type: String
+  PublicEC2SecurityGroupId:
+    Type: String
+  PrivateEC2SecurityGroupId:
+    Type: String
+
+Resources:
+  PublicInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PublicSubnetId
+      SecurityGroupIds:
+        - !Ref PublicEC2SecurityGroupId
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-public-ec2'
+
+  PrivateInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PrivateSubnetId
+      SecurityGroupIds:
+        - !Ref PrivateEC2SecurityGroupId
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-private-ec2'
+
+Outputs:
+  PublicInstanceIP:
+    Value: !GetAtt PublicInstance.PublicIp
+  PrivateInstanceIP:
+    Value: !GetAtt PrivateInstance.PrivateIp
