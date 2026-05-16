@@ -17,13 +17,13 @@ Mã nguồn này sẽ tạo ra các tài nguyên sau trên AWS:
 
 ## Yêu cầu chuẩn bị (Prerequisites)
 1. **Terraform CLI**: Đảm bảo máy tính đã cài đặt Terraform v1.0.0 trở lên. (Có thể kiểm tra bằng lệnh `terraform version`).
-2. **AWS CLI v2**: Đã được cài đặt và cấu hình tài khoản AWS (chạy lệnh `aws configure` để thiết lập `Access Key` và `Secret Key`). Mặc định region là `us-east-1` (hoặc cấu hình trong file `variables.tf`).
+2. **AWS CLI v2**: Đã được cài đặt và cấu hình tài khoản AWS (chạy lệnh `aws configure` để thiết lập `Access Key` và `Secret Key`). Mặc định region là `ap-southeast-2` (hoặc cấu hình trong file `variables.tf`).
 
 ---
 
 ## Hướng dẫn chạy mã nguồn (Deployment Steps)
 
-Mở cửa sổ dòng lệnh (Terminal/Command Prompt) và di chuyển vào thư mục gốc của dự án (`aws/`), sau đó thực thi lần lượt các lệnh sau:
+Mở cửa sổ dòng lệnh (Terminal/Command Prompt) và di chuyển vào thư mục gốc của dự án (`Lab1/terraform`), sau đó thực thi lần lượt các lệnh sau:
 
 ### Bước 1: Khởi tạo Project
 Tải các thư viện nhà cung cấp (AWS Provider, Local, TLS) cần thiết:
@@ -34,13 +34,20 @@ terraform init
 ### Bước 2: Xem trước những thay đổi sẽ áp dụng
 Kiểm tra lại cấu hình và lên kế hoạch những tài nguyên sẽ được tạo trên AWS:
 ```bash
-terraform plan
+MY_IP=$(curl -s https://checkip.amazonaws.com)/32
+echo $MY_IP
+
+terraform plan \
+  -var="project_name=lab1" \
+  -var="ssh_allowed_ip=$MY_IP"
 ```
 
 ### Bước 3: Áp dụng triển khai hạ tầng
 Tạo toàn bộ tài nguyên:
 ```bash
-terraform apply
+terraform apply \
+  -var="project_name=lab1" \
+  -var="ssh_allowed_ip=$MY_IP"
 ```
 *(Hệ thống sẽ hỏi bạn xác nhận tạo tài nguyên, nhập `yes` và nhấn Enter)*.
 
@@ -88,6 +95,27 @@ curl -I https://amazon.com
 ## Dọn dẹp hệ thống (Clean up)
 **Tuyệt đối quan trọng:** Sau khi thực hành và kiểm tra mọi thứ thành công, hãy thực hiện lệnh xóa sạch tài nguyên để tránh phát sinh chi phí AWS ngoài ý muốn (Elastic IP và NAT Gateway tính phí theo giờ rất đắt).
 ```bash
-terraform destroy
+terraform destroy \
+  -var="project_name=lab1" \
+  -var="ssh_allowed_ip=$MY_IP"
 ```
 *(Gõ `yes` và Enter khi nhận được cảnh báo).*
+
+## Test cases
+
+Chạy test validate Terraform:
+
+```bash
+cd Lab1/tests
+./terraform_validate.sh
+
+cd ../terraform
+VPC_ID=$(terraform output -raw vpc_id)
+```
+
+Chạy test kiểm tra tài nguyên AWS:
+```bash
+cd ../tests
+./aws_check_resources.sh $VPC_ID
+```
+
