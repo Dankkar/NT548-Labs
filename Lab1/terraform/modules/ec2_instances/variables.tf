@@ -10,12 +10,12 @@ variable "ami_id" {
 
 variable "instance_type" {
   description = "Loại instance cho EC2 instances"
-  type        = string 
+  type        = string
 }
 
 variable "key_name" {
   description = "Tên key pair để truy cập EC2 instances"
-  type        = string 
+  type        = string
 }
 
 variable "public_subnet_id" {

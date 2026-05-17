@@ -15,5 +15,5 @@ output "public_instance_public_ip" {
 
 output "private_instance_private_ip" {
   description = "Private IP của Private EC2 instance"
-  value       = aws_instance.private_instance.private_ip 
+  value       = aws_instance.private_instance.private_ip
 }

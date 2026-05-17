@@ -12,7 +12,7 @@ module "keypair" {
   source = "./modules/keypair"
 
   project_name = var.project_name
-  key_name     = var.key_name 
+  key_name     = var.key_name
 }
 
 module "nat_gateway" {
