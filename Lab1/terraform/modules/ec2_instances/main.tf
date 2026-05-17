@@ -7,7 +7,7 @@ resource "aws_instance" "public_instance" {
   associate_public_ip_address = true
 
   tags = {
-    Name = "${var.project_name}-public-ec2"
+    Name = "${var.project_name}-public-ec2" 
   }
 }
 
