@@ -1,0 +1,122 @@
+name: Terraform CI/CD
+
+on:
+  push:
+      branches:
+        - main
+      paths:
+        - 'Lab1/terraform/**'
+  pull_request:
+      branches:
+        - main
+      paths:
+        - 'Lab1/terraform/**'
+
+env:
+  AWS_REGION: "ap-southeast-2"
+  TF_WORKING_DIR: "./Lab1/terraform"
+  TF_VERSION: "1.14.6"
+
+jobs:
+  # Job 1: Terraform validate & Format check
+  terraform-validate:
+    name: "Terraform Validate"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v5
+        with:
+          terraform-version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform init & validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -backend=false && terraform validate
+
+  checkov-scan:
+    name: "Checkov Scan"
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov action
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ env.TF_WORKING_DIR }}
+          framework: terraform
+          output_format: cli
+          soft_fail: true
+
+  terraform:
+    runs-on: ubuntu-latest
+    needs: [terraform-validate, checkov-scan]
+    permissions:
+      id-token: write
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v5
+        with:
+          terraform-version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform init
+        id: init
+        run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        
+      - name: Terraform Format
+        id: format
+        run: terraform fmt -check
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        continue-on-error: true
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        continue-on-error: true
+        
+      - name: Update Pull Request Status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `#### Terraform Format and Style
+            ${{ steps.format.outcome == 'success' ? 'Terraform format check passed :)' : 'Terraform format check failed :(' }}
+
+            #### Terraform Plan Results
+            <details><summary>Terraform Plan Results</summary>
+
+            \`\`\`
+            ${{ steps.plan.outputs.stdout }}
+            \`\`\`
+            
+            </details>
+
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.format.outcome == 'success' && steps.plan.outcome == 'success'
+        run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}

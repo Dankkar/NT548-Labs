@@ -17,7 +17,7 @@ Mã nguồn này sẽ tạo ra các tài nguyên sau trên AWS:
 
 ## Yêu cầu chuẩn bị (Prerequisites)
 1. **Terraform CLI**: Đảm bảo máy tính đã cài đặt Terraform v1.0.0 trở lên. (Có thể kiểm tra bằng lệnh `terraform version`).
-2. **AWS CLI v2**: Đã được cài đặt và cấu hình tài khoản AWS (chạy lệnh `aws configure` để thiết lập `Access Key` và `Secret Key`). Mặc định region là `ap-southeast-2` (hoặc cấu hình trong file `variables.tf`).
+2. **AWS CLI v2**: Đã được cài đặt và cấu hình tài khoản AWS (chạy lệnh `aws configure` để thiết lập `Access Key` và `Secret Key`). Mặc định region là `us-east-1` (hoặc cấu hình trong file `variables.tf`).
 
 ---
 

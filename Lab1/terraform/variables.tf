@@ -6,7 +6,7 @@ variable "project_name" {
 variable "aws_region" {
   description = "AWS Region"
   type        = string
-  default     = "ap-southeast-2"
+  default     = "us-east-1"
 }
 
 variable "vpc_cidr_block" {
@@ -30,7 +30,7 @@ variable "private_subnet_cidrs" {
 variable "azs" {
   description = "Danh sách các Availability Zones"
   type        = list(string)
-  default     = ["ap-southeast-2a", "ap-southeast-2b"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 variable "ssh_allowed_ip" {
@@ -41,7 +41,7 @@ variable "ssh_allowed_ip" {
 variable "ami_id" {
   description = "AMI ID cho EC2 instances"
   type        = string
-  default     = "ami-098341ffb8b768450"
+  default     = "ami-0236922087fa98b6e"
 }
 
 variable "instance_type" {
