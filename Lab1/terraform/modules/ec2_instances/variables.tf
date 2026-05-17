@@ -10,7 +10,7 @@ variable "ami_id" {
 
 variable "instance_type" {
   description = "Loại instance cho EC2 instances"
-  type        = string
+  type        = string 
 }
 
 variable "key_name" {
