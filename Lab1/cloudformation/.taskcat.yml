@@ -1,0 +1,13 @@
+project:
+  name: lab1-cfn-test
+  regions:
+    - us-east-1
+tests:
+  default:
+    template: ./template.yaml
+    regions:
+      - us-east-1
+    parameters:
+      ProjectName: 'lab2-test'
+      AmiId: 'ami-0e1bed4f06a3b463d' # You might need to change this to a valid Ubuntu AMI in us-east-1 if this one is outdated
+      KeyName: 'lab1-key'

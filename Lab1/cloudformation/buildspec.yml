@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Installing setuptools<70.0.0, cfn-lint and taskcat..."
+      - pip install "setuptools<70.0.0" cfn-lint taskcat
+  pre_build:
+    commands:
+      - cd cloudformation
+      - echo "Running cfn-lint to check template syntax..."
+      - cfn-lint template.yaml
+  build:
+    commands:
+      - echo "Running taskcat to test deployment..."
+      - taskcat test run
+artifacts:
+  files:
+    - template.yaml
+    - parameters.json
+  base-directory: cloudformation
