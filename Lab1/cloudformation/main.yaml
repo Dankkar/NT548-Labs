@@ -99,3 +99,5 @@ Outputs:
     Value: !GetAtt EC2InstancesStack.Outputs.PublicInstanceIP
   PrivateInstanceIP:
     Value: !GetAtt EC2InstancesStack.Outputs.PrivateInstanceIP
+  DefaultSecurityGroupId:
+    Value: !GetAtt VPCStack.Outputs.DefaultSecurityGroupId

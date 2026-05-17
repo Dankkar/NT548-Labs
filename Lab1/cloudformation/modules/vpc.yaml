@@ -94,3 +94,5 @@ Outputs:
     Value: !Ref PrivateSubnet1
   PrivateSubnet2Id:
     Value: !Ref PrivateSubnet2
+  DefaultSecurityGroupId:
+    Value: !GetAtt VPC.DefaultSecurityGroup
