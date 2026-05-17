@@ -15,7 +15,7 @@ variable "instance_type" {
 
 variable "key_name" {
   description = "Tên key pair để truy cập EC2 instances"
-  type        = string
+  type        = string 
 }
 
 variable "public_subnet_id" {
