@@ -13,7 +13,7 @@ on:
         - 'Lab1/terraform/**'
 
 env:
-  AWS_REGION: "ap-southeast-2"
+  AWS_REGION: "us-east-1"
   TF_WORKING_DIR: "./Lab1/terraform"
   TF_VERSION: "1.14.6"
 
@@ -97,7 +97,7 @@ jobs:
         with:
           script: |
             const output = `#### Terraform Format and Style
-            ${{ steps.format.outcome == 'success' ? 'Terraform format check passed :)' : 'Terraform format check failed :(' }}
+            ${{ steps.format.outcome == 'success' && 'Terraform format check passed :)' || 'Terraform format check failed :(' }}
 
             #### Terraform Plan Results
             <details><summary>Terraform Plan Results</summary>
