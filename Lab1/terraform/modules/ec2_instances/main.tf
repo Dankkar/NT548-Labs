@@ -16,7 +16,7 @@ resource "aws_instance" "private_instance" {
   instance_type          = var.instance_type
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [var.private_ec2_sg_id]
-  key_name               = var.key_name
+  key_name               = var.key_name 
 
   tags = {
     Name = "${var.project_name}-private-ec2"
