@@ -70,7 +70,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v5
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform-version: ${{ env.TF_VERSION }}
       
