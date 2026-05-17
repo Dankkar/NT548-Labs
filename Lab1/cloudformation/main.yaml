@@ -31,7 +31,7 @@ Parameters:
     Default: 'lab1-key'
   SSHAllowedIP:
     Type: String
-    Default: '0.0.0.0/0'
+    Description: CIDR allowed to SSH into Public EC2
 
 Resources:
   VPCStack:
